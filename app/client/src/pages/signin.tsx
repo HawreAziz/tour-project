@@ -24,7 +24,8 @@ export const Signin = () => {
     const [formValue, setFormValue] = useState<Form>({ email: "", password: "" })
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { loading, error } = useAppSelector((data) => data);
+    const { loading, error } = useAppSelector(({auth}) => auth);
+
     const onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         dispatch(signin({ ...formValue, navigate, toast }));

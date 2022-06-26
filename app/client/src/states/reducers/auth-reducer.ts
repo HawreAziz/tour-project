@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast as ToastType } from 'react-toastify';
-import { AxiosError } from "axios";
 import { NavigateFunction } from "react-router-dom";
 import {
     signin as signinRoute,
     signup as signupRoute,
 } from '../../api';
+import { UserData, User } from '../../../types';
+import { formatError } from ".";
 import localforage from "localforage";
-import { User } from '../../../types';
 
 
 
@@ -37,16 +37,6 @@ interface SignupParams extends AuthParams {
 }
 
 
-type Err = {
-    error: string;
-}
-
-const formatError = (error: any): string => {
-    console.log(error);
-    return error instanceof AxiosError
-        ? error.response?.data.error  //|| error.response?.
-        : "Something went wrong on the server";
-}
 
 export const signin = createAsyncThunk<AuthState, AuthParams, { rejectValue: { error: string } }>(
     "/auth/signin",
@@ -57,8 +47,7 @@ export const signin = createAsyncThunk<AuthState, AuthParams, { rejectValue: { e
             signinParams.navigate('/');
             return response.data as AuthState;
         } catch (error) {
-            const err = rejectWithValue({ error: formatError(error) });
-            return err;
+            return rejectWithValue({ error: formatError(error) });
         }
     });
 
@@ -82,11 +71,11 @@ const authSlice = createSlice({
     name: "Auth",
     initialState,
     reducers: {
-        setUser(state: AuthState, { payload }: PayloadAction<User>) {
-            state.user = payload;
+        setUser(state: AuthState, { payload }: PayloadAction<UserData>) {
+            state.user = payload.user;
         },
         signout(state: AuthState) {
-            (async () => await localforage.clear())();
+            localforage.clear();
             state.user = null;
         }
     },
@@ -99,13 +88,12 @@ const authSlice = createSlice({
             if (!payload) {
                 return;
             }
-            (async () => await localforage.setItem("profile", JSON.stringify(payload.user)))();
+            (async () => await localforage.setItem("profile", JSON.stringify(payload)))();
             state.user = payload.user;
         });
 
         builder.addCase(signin.rejected, (state: AuthState, { payload }) => {
-            const error = payload ? payload.error : "Something went wrong";
-            state.error = error;
+            state.error = payload ? payload.error : "Something went wrong";
             state.loading = false;
         });
 
@@ -119,8 +107,7 @@ const authSlice = createSlice({
         });
 
         builder.addCase(signup.rejected, (state: AuthState, { payload }) => {
-            const error = payload ? payload.error : "Something went wrong";
-            state.error = error;
+            state.error = payload ? payload.error : "Something went wrong";
             state.loading = false;
         });
     }

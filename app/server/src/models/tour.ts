@@ -6,8 +6,8 @@ interface TourAttrs {
     description?: string,
     name: string,
     creator: string,
-    createdAt?: Date,
-    tags?: [string],
+    createdAt: Date,
+    tags: [string],
     imageFile: string
     likeCount?: number
 }
@@ -19,7 +19,7 @@ interface TourDoc extends mongoose.Document {
     name: string,
     creator: string,
     createdAt?: Date,
-    tags?: [string],
+    tags: [string],
     imageFile: string
     likeCount: number
 }
@@ -42,6 +42,14 @@ const tourSchema = new mongoose.Schema({
     likeCount: {
         type: Number,
         default: 0
+    }
+}, {
+    toJSON: {
+        transform: (doc, ret) => {
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+        }
     }
 });
 

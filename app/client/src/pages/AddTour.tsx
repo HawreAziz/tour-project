@@ -10,11 +10,13 @@ import {
 } from 'mdb-react-ui-kit';
 import ChipInput from 'material-ui-chip-input';
 import FileBase from 'react-file-base64';
-import { Tour } from '../../types'
+import { TourData } from '../../types'
 import { toast } from 'react-toastify';
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { createTour } from '../states/reducers/tour-reducer';
+import { useNavigate } from 'react-router-dom';
 
-const INITIAL_STATE: Tour = {
-    // name: "",
+const INITIAL_STATE: TourData = {
     title: "",
     description: "",
     imageFile: "",
@@ -22,13 +24,16 @@ const INITIAL_STATE: Tour = {
 }
 
 const AddTour = () => {
-    const [tourData, setTourData] = useState<Tour>(INITIAL_STATE);
+    const [tourData, setTourData] = useState<TourData>(INITIAL_STATE);
+    const dispatch = useAppDispatch();
+    const { error } = useAppSelector( ({tour}) => tour);
+    const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (error) {
-    //         toast.error(error);
-    //     }
-    // }, [error]);
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+        }
+    }, [error]);
 
     const onAddTag = (tag: string) => {
         setTourData({ ...tourData, tags: [...tourData.tags, tag] });
@@ -53,8 +58,7 @@ const AddTour = () => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("create tour");
-        // createTour(tourData);
+        dispatch(createTour({ ...tourData, toast, navigate }));
     }
 
     return (

@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 import AuthReducer from './reducers/auth-reducer';
+import tourReducer from './reducers/tour-reducer';
 
 
 
 const store = configureStore({
-    reducer: AuthReducer
+    reducer: {
+        auth: AuthReducer,
+        tour: tourReducer
+    }
 });
 
 

@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import localforage from 'localforage';
+import { TourData } from '../../types';
 
 
 const api = axios.create({
@@ -27,14 +28,12 @@ interface Signup {
     name: string;
 }
 
-interface TourData {
-    title: string;
-    description: string;
-    imageFile: string;
-    tags: string[];
-}
 
 
-export const signin = async <T>(signinCreds: SigninCreds) => await api.post<T>('/users/signin', signinCreds);
+export const signin = async (signinCreds: SigninCreds) => await api.post('/users/signin', signinCreds);
 export const signup = async (signupCreds: Signup) => await api.post('/users/signup', signupCreds);
 export const createTour = async (tourData: TourData) => await api.post('/tours/create', tourData);
+export const getTours = async () => await api.get('/tours');
+export const getTour = async (tourId: string) => await api.get('/tour/${tourId}');
+export const getToursById = async (userId: string) => await api.get(`/tours/${userId}`);
+export const deleteTour = async (tourId: string) => await api.delete(`/tours/${tourId}`)

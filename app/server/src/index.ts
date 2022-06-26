@@ -6,21 +6,32 @@ import {
     singup,
     signin,
     createTour,
-    showTours
+    showTours,
+    userToursRoute,
+    updateRoute,
+    deleteRoute,
+    showTourRoute,
 } from "./routes";
 import { errorHandler, BadRequest, AuthenticationError } from './errors';
 
 const PORT = 5000;
 const app = express();
 
+
 app.use(json({ limit: "30mb" }) as RequestHandler);
 app.use(urlencoded({ limit: "30mb", extended: true }) as RequestHandler);
 app.use(cors());
+
+
+// routes
 app.use(singup);
 app.use(signin);
 app.use(createTour);
 app.use(showTours);
-
+app.use(userToursRoute);
+app.use(updateRoute);
+app.use(deleteRoute);
+app.use(showTourRoute);
 
 const { MONGO_PASSWORD, AUTH_SECRET } = process.env;
 if (!MONGO_PASSWORD) {
@@ -32,11 +43,10 @@ if (!AUTH_SECRET) {
     throw new AuthenticationError("AUTH_SECRET was not set, Please add it to the environment");
 }
 
-const MONGODB_URL = `mongodb+srv://hawre:${MONGO_PASSWORD}@cluster0.n1qvl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+const MONGODB_URL = `mongodb+srv://hawre:${MONGO_PASSWORD}@cluster0.xdj54.mongodb.net/?retryWrites=true&w=majority`
 
 // Add apropriate error later
 app.all("*", async () => {
-    console.log("badRequesteror");
     throw new BadRequest("Page not found");
 });
 

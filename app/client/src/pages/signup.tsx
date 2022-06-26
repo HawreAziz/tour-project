@@ -36,7 +36,7 @@ export const Signup = () => {
     const { email, firstName, lastName, password, confirmPassword } = formValue;
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { error } = useAppSelector(auth => auth);
+    const { error } = useAppSelector(({ auth }) => auth);
 
     const onSubmit = (event: React.FormEvent) => {
         event.preventDefault();

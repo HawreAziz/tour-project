@@ -1,21 +1,29 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from 'jsonwebtoken';
+import { UserRequest } from "../data_container";
 import { AuthenticationError } from "../errors/authentication-error";
 
 
+interface User {
+    email: string;
+    name: string;
+    id: string;
+}
 
-export const auth = (req: Request, res: Response, next: NextFunction) => {
+
+export const auth = (req: UserRequest, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-    if (!token) {
+    const parsedToken = token?.split(" ")[1];
+    if (!parsedToken || parsedToken === 'undefined') {
         throw new AuthenticationError("Token were not given");
     }
-    const parsedToken = token.split(" ")[1];
-    console.log(`auth in auth ${parsedToken}`);
     try {
-        const data = jwt.verify(parsedToken, process.env.AUTH_SECRET!) as string;
-        console.log(data);
-    } catch (error) {
-        console.log(error);
+        const user = jwt.verify(parsedToken, process.env.AUTH_SECRET!) as User;
+        req.userId = user.id;
+        req.userName = user.name;
+
+    } catch (TokenExipredError) {
+        return res.status(404).send({ error: "Could not verify token or token expired." });
     }
 
     next();
